@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CWEB_CONFIG>
+	<!-- 检测链路时间间隔 -->
+	<LINK_TEST_TIME>5000</LINK_TEST_TIME>
+	<!-- 网关接入信息，支持多地区接入，只要配置多个CITY_NAME信息即可 -->
+	<CITY_INFO>
+		<!-- name属性唯一标示一个网关，accessNo为移动运营商分配的短信接入号 -->
+		<CITY_NAME name="NJ" protocol="cmpp" accessNo="1064899370138">
+			
+			<!-- 移动运营商分配的用户名 -->
+			<ACCOUNT>370138</ACCOUNT>
+			<!-- 移动运营商分配的密码 -->
+			<PASSWORD>370138</PASSWORD>
+			<!-- 移动运营商分配的企业代码 -->
+			<ENTERPRISE_NO>370138</ENTERPRISE_NO>
+			<!-- 是否需要信息回执消息 -->
+			<REPORT_NEED>true</REPORT_NEED>
+			<!-- 短信网关IP地址 -->
+			<CMMP_SERVER_IP>183.230.96.94</CMMP_SERVER_IP>
+			<!-- 短信网关端口号 -->
+			<CMMP_SERVER_PORT>17890</CMMP_SERVER_PORT>
+			<!-- CMPP链路测试消息发送时间间隔 -->
+			<ACTIVE_TEST_TIME>180000</ACTIVE_TEST_TIME>
+			<!-- CMPP接收线程等待时间间隔 -->
+			<RECEIVE_THREAD_WAIT_TIME>5000</RECEIVE_THREAD_WAIT_TIME>
+			<!-- service id,平台的业务代码 -->
+			<SERVICE_ID>wlwmat</SERVICE_ID>
+		</CITY_NAME>
+		
+		<!-- 用于发送移动以外的电话号码 -->
+		<CITY_NAME name="NJ1" protocol="cmpp" accessNo="1064899370138">
+			<!-- 移动运营商分配的用户名 -->
+			<ACCOUNT>370138</ACCOUNT>
+			<!-- 移动运营商分配的密码 -->
+			<PASSWORD>370138</PASSWORD>
+			<!-- 移动运营商分配的企业代码 -->
+			<ENTERPRISE_NO>370138</ENTERPRISE_NO>
+			<!-- 是否需要信息回执消息 -->
+			<REPORT_NEED>true</REPORT_NEED>
+			<!-- 短信网关IP地址 -->
+			<CMMP_SERVER_IP>183.230.96.94</CMMP_SERVER_IP>
+			<!-- 短信网关端口号 -->
+			<CMMP_SERVER_PORT>17890</CMMP_SERVER_PORT>
+			<!-- CMPP链路测试消息发送时间间隔 -->
+			<ACTIVE_TEST_TIME>180000</ACTIVE_TEST_TIME>
+			<!-- CMPP接收线程等待时间间隔 -->
+			<RECEIVE_THREAD_WAIT_TIME>5000</RECEIVE_THREAD_WAIT_TIME>
+			<!-- service id,平台的业务代码 -->
+			<SERVICE_ID>wlwmat</SERVICE_ID>
+		</CITY_NAME>
+	</CITY_INFO>
+</CWEB_CONFIG>

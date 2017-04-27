@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>API-TESTER</title>
+    <style>
+    	input,select{font-size:12px; color:#000; border:1px solid #bababa;margin:0;}
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/json_beauty.js"></script>
+    <script type="text/javascript" src="js/sjs-loader.js"></script>
+    <script type="text/sjs">
+      var ok_no=0;
+      var nok_no=0;
+      var times = 0;
+      var warnNo = 0;
+      var efenceNo = 0;
+      var detect_ms = 5000; //检测间隔时间
+      var interval_handle;
+      var beginInvokeTime=0;
+      var count=0;
+      //common function
+      function invoke_api(q)
+      {
+        var now = new Date();
+        beginInvokeTime=now.getHours()*60*60*1000 + now.getMinutes()*60*1000 + now.getSeconds()*1000 + now.getMilliseconds();
+        $.ajax({
+              url:'pushapi',
+              type: 'post',
+              async: false,
+              dataType:'json',
+              timeout: 100000,
+              error: function(ret){deal_error(ret);},
+              success: function(xml){deal_result(xml);},
+              data: q
+        });
+      }
+
+      function deal_result(res)
+      {
+        //alert(JSON.stringify(res));
+        if(res.result == 0 || res.result == 256)
+        {
+          if(res.cmd=="checkAlarm" || res.cmd=="checkEfence")
+          {
+            if(res.cmd=="checkAlarm")
+            {
+              if(res.totalRecordNum)
+              {
+                warnNo=res.totalRecordNum;
+              }
+            }
+            if(res.cmd=="checkEfence")
+            {
+              if(res.totalRecordNum )
+              {
+                efenceNo=res.totalRecordNum;
+              }
+            }
+            $('#msgLabel').html('栅栏消息:['+efenceNo+']/报警消息:['+warnNo+']'+'<input type="button" onclick="format_input()" value="格式化代码" >');
+          }
+          //$("#response").val(JSON.stringify(res));
+          set_output(JSON.stringify(res));
+          echoOk();
+          calcReturn(res);
+        }
+        else if(res.result == 511 && res.cmd=="init")
+        {
+          set_output(JSON.stringify(res));
+          echoOk();
+          calcReturn(res);
+          $("#console").val($("#console").val()+res.cmd+":\t"+res.resultNote+"\n");
+        }
+        else
+        {
+          var out = JSON.stringify(res);
+          echoError();
+          set_output(out);
+          if(res.cmd)
+          {
+            $("#console").val($("#console").val()+res.cmd+":\t"+res.resultNote+"\n");
+          }
+          else
+          {
+            $("#console").val($("#console").val()+"remote invoke:\t"+res.resultNote+"\n");
+          }
+        }
+        var now = new Date();
+        finishInvokeTime=now.getHours()*60*60*1000 + now.getMinutes()*60*1000 + now.getSeconds()*1000 + now.getMilliseconds();
+        $("#console").val("["+res.cmd + "] spend " + (finishInvokeTime - beginInvokeTime) + " ms \n"+$("#console").val());
+      }
+
+      function stopTest()
+      {
+        times = 0;
+        clearInterval(interval_handle);
+      }
+
+      function calcReturn(res)
+      {
+        $("#resultNo").html("<"+res.totalRecordNum+">");
+      }
+
+      function deal_error(res)
+      {
+        set_output(JSON.stringify(res));
+        echoError();
+      }
+
+      function echoError()
+      {
+        nok_no = nok_no + 1;
+        $("#detailResult").html("<font color='green'>成功:["+ok_no+"]</font>/<font color='red'>失败:["+nok_no+"]</font>");
+      }
+
+      function echoOk()
+      {
+        ok_no = ok_no + 1;
+        $("#detailResult").html("<font color='green'>成功:["+ok_no+"]</font>/<font color='red'>失败:["+nok_no+"]</font>");
+      }
+
+	  var reg=new RegExp("消息","g"); //创建正则RegExp对象 
+      var ww;
+      function execute(request)
+      {
+        if(request)
+        {
+          invoke_api(request);
+        }else if($("#testTime").val())
+        {
+          var now = new Date();
+          bTime=now.getHours()*60*60*1000 + now.getMinutes()*60*1000 + now.getSeconds()*1000 + now.getMilliseconds();
+          // invoke_api($("#request").val());
+	//	   ww=setInterval(bnx,1000*5*60);
+
+          for(var i = 0; i < $("#testTime").val(); i++)
+          {
+            var reg=new RegExp("消息","g"); //创建正则RegExp对象 
+            var strObj=$("#request").val();
+			var dd= strObj.replace(reg,"消息"+i);
+            invoke_api(dd);
+          }
+
+          var now = new Date();
+          eTime=now.getHours()*60*60*1000 + now.getMinutes()*60*1000 + now.getSeconds()*1000 + now.getMilliseconds();
+          $('#msgLabel').html($("#testTime").val()+" invoke spend "+(eTime-bTime)+" ms"+'<input type="button" onclick="format_input()" value="格式化代码" >');
+        }
+        else
+        {
+          invoke_api($("#request").val());
+        }
+      }
+
+      function bnx(){
+ 			var reg=new RegExp("消息","g"); //创建正则RegExp对象 
+            var strObj=$("#request").val();
+			var dd= strObj.replace(reg,"消息"+count);
+            invoke_api(dd);
+            if(count>=parseInt($("#testTime").val())){
+  			   clearInterval(ww);
+            }
+			count++;
+      }
+
+      function formatJson(jsonStr)
+      {
+        var str = jsonStr.replace(/,/g,",\n").replace(/:\{/g,":\n{").replace(/\{\"/g,"{\n\"").replace(/\[\{/g,"[\n{");
+        str = str.replace(/\}/g,"\n\}").replace(/\]/g,"\n\]");
+        return str;
+      }
+      function format_input()
+      {
+        var jsontxt = js_beautify(unpacker_filter($("#request").val()), {
+            indent_size: 2,
+            indent_char: ' ',
+            preserve_newlines:true,
+            brace_style: 'expand',
+            keep_array_indentation:true,
+            space_after_anon_function:true});
+        $("#request").val(jsontxt);
+        //set_output("");
+      }
+      
+      function ui_init(request)
+      {
+        var jsontxt = js_beautify(unpacker_filter(request), {
+            indent_size: 2,
+            indent_char: ' ',
+            preserve_newlines:true,
+            brace_style: 'expand',
+            keep_array_indentation:true,
+            space_after_anon_function:true});
+        $("#request").val(jsontxt);
+        set_output("");
+      }
+
+      function set_output(response)
+      {
+        if(!response)
+        {
+          $("#response").val("");
+        }
+        else
+        {
+          var jsontxt = js_beautify(unpacker_filter(response), {
+              indent_size: 2,
+              indent_char: ' ',
+              preserve_newlines:true,
+              brace_style: 'expand',
+              keep_array_indentation:false,
+              space_after_anon_function:true});
+          $("#response").val(jsontxt);
+        }
+      }
+
+      //business function
+      function android_push(term)
+      {
+       count++;
+        var q='{"cmd":"pushMsg","params":{"pushMode":0,"userId":"wangwb","mobile":"18918918918","pushId":"","smsAuthKey":"dina.cpsdna.org","online":0,"msgBody":{"msgType":0,"taskType":0,"objId":"1231231313","lpno":"苏A12345","idName":"苏A12345","msg":"android推送的消息","caseId":"234234234","corpId":"927542943523","recUid":"e9275qe42943523","caseOper":0}}}';
+        ui_init(q);
+      }
+
+      function ios_push(term)
+      {
+        var q='{"cmd":"pushMsg","params":{"appName":"xfinder4personal,xfinder4company,4soncare","pushMode":0,"userId":"husm","mobile":"18918918918","pushId":"","smsAuthKey":"dina.cpsdna.org","online":0,"msgBody":{"msgType":0,"taskType":0,"objId":"1231231313","lpno":"苏A12345","idName":"苏A12345","msg":"IOS推送的消息","caseId":"234234234","corpId":"927542943523","recUid":"e9275qe42943523","caseOper":0}}}';
+        ui_init(q);
+      }
+      function new_ios_push(term)
+      {
+        var q='{"cmd":"pushMsg","params":{"appName":"xfinder4personal,xfinder4company,4soncare","pushMode":0,"userId":"husm","mobile":"18918918918","pushId":"","smsAuthKey":"dina.cpsdna.org","online":0,"msgBody":{ "aps": {"alert":"新IOS消息格式","badge":12,"msgType":0}}}}';
+        ui_init(q);
+      }
+
+      function sms_push(term)
+      {
+        var q='{"cmd":"pushMsg","params":{"pushMode":1,"userId":"husm","mobile":"1891891891","smsAuthKey":"dina.cpsdna.org","online":0,"msgBody":{"msgType":0,"taskType":0,"objId":"1231231313","lpno":"苏A12345","idName":"苏A12345","msg":"短信消息","caseId":"234234234","corpId":"927542943523","recUid":"e9275qe42943523","caseOper":0}}}';
+        ui_init(q);
+      }
+
+      function cmsms_push(term)
+      {
+        var q='{"cmd":"pushMsg","params":{"sp":"chinaMobile","pushMode":1,"userId":"husm","mobile":"1891891891","smsAuthKey":"dina.cpsdna.org","online":0,"msgBody":{"msgType":0,"taskType":0,"objId":"1231231313","lpno":"苏A12345","idName":"苏A12345","msg":"短信消息","caseId":"234234234","corpId":"927542943523","recUid":"e9275qe42943523","caseOper":0}}}';
+        ui_init(q);
+      }
+	  
+  	  function query()
+      {
+        var q='{"cmd":"query","params":{"tabName":"sms_msg","day":"2012-09-06"}}';
+        ui_init(q);
+      }
+
+  	  function spiderdata()
+      {
+        var q='{"cmd":"spiderdata"}';
+        ui_init(q);
+      }
+
+      function showRequest()
+      {
+        eval($("#cmd").val());
+        continuousRun();
+      }
+
+      function continuousRun()
+      {
+        if($("#chooseBox").attr("checked"))
+        {
+          execute();
+        }
+      }
+
+      function dateString()
+      {
+        var randSuffix = Math.round(Math.random()*1000000);
+          var date = new Date();
+          var year = date.getFullYear();
+          var month = date.getMonth();
+          var dat = date.getDate();
+          var hour = date.getHours();
+          var minute = date.getMinutes();
+          var second = date.getSeconds();
+          var milisecond = date.getMilliseconds();
+          return year+""+month+""+dat+""+hour+""+minute+""+second;//+""+milisecond+"_"+randSuffix;
+      }
+
+      function autoTest()
+      {
+        $("#chooseBox").attr("checked",true);
+        times=prompt("请输入测试次数","1");
+        for(var i = 0; i < times; i++)
+        {
+          var rand = Math.round(Math.random() * 10000);
+          sendSms();continuousRun();
+          $("#msgLabel").html((i+1)+"/"+times+"轮"+'<input type="button" onclick="format_input()" value="格式化代码" >');
+          $("#detailResult").html("<font color='#005800'>成功:["+ok_no+"]</font><font color='red'>失败:["+nok_no+"]</font>");
+        }
+        $("#chooseBox").attr("checked",false);
+      }
+
+      function randCategory(randD)
+      {
+        var cates = [11,12,21,31,32,33,34,41,42,43,51,61];
+        if(randD%12==11)
+        {
+          return "";
+        }
+        else
+        {
+          return cates[randD%12];
+        }
+      }
+
+ function sysRefresh()
+      {
+        var q='{"cmd":"sysRefresh","params":{"logLevel":"debug","refresh":false}}';
+        ui_init(q);
+      }
+
+
+	function activityCheck()
+	  {
+    	var q='{"cmd":"activityCheck","params":{}}';
+        ui_init(q);
+      }
+ 	
+
+  </script>
+  </head>
+  <body onload="showRequest()" style="font-family:'Courier New';">
+    <div id="command">
+      <label for="cmd" >API接口</label>
+      <select name="cmd" id="cmd" onchange="showRequest()">
+        <option value="android_push()">android-push</option>
+        <option value="ios_push()">ios-push旧格式</option>
+        <option value="new_ios_push()">ios-push新格式</option>
+        <option value="sms_push()">sms-push</option>
+        <option value="cmsms_push()">移动找TA sms-push</option>
+        <option value="query()">查询表记录</option>
+        <option value="sysRefresh()">日志级别</option>
+        <option value="activityCheck()">监控查询接口</option>
+       <!--  <option value="spiderdata()">抓取数据</option> -->
+      </select>
+      <label id="chooseBoxLabel" for="chooseBox">选中测试<input type="checkbox" id="chooseBox" name="chooseBox"></label>
+      <input id="testTime" type="text" style="width:30px;height:15px;font-family: 'Courier New';" value="1" >
+      <input type="button" onclick="execute()" value="单项测试" >
+      <input type="button" id="autoTest" name="autoTest" value="自动化测试" onclick="autoTest()">
+      <label id="detailResult"></label>
+      <label id="resultNo"></label>
+      <label id="stopLabel" style="float:right;margin-right:13px;"><input type="button" id="autoTest" name="autoTest" value="停止检测" onclick="stopTest()"></label>
+      <label id="msgLabel"  style="float:right;margin-right:10px;"><input type="button" onclick="format_input()" value="格式化代码" ></label>
+    </div>
+    <hr>
+    <div id="in" style="width:310px;height:530px;float:left" >
+      <textarea id="request" style="width:300px;height:530px;font-family: 'Courier New';"> </textarea>
+    </div>
+    <div id="out" style="width:935px;height:530px;float:left" >
+      <textarea id="response" style="width:935px;height:530px;font-family: 'Courier New';" readonly> </textarea>
+    </div>
+    <br>
+    <div id="error_window" style="width:1230px;height:50px;margin-top:523px">
+      <textarea id="console" style="width:1245px;height:60px" readonly ></textarea>
+    </div>
+  </body>
+</html>
