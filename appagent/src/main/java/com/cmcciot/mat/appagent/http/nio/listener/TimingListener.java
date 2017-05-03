@@ -4,11 +4,11 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cmcciot.mat.appagent.http.nio.HttpKeyConstant;
 import com.cmcciot.mat.appagent.http.nio.threadpool.TemporaryObject;
@@ -30,7 +30,7 @@ public class TimingListener implements ServletContextListener
     /**
      * 日志记录
      */
-    private Logger logger = Logger.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     
     @Override
     public void contextDestroyed(ServletContextEvent e)

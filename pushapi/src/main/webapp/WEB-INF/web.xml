@@ -32,4 +32,12 @@
 		<servlet-class>com.cmcciot.mat.pushapi.sms.TimerServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<context-param>
+        <param-name>logbackConfigLocation</param-name>
+        <param-value>classpath:pushapi-logback.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+    </listener>
 </web-app>

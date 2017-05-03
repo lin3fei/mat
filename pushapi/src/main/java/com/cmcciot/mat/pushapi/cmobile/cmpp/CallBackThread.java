@@ -64,7 +64,6 @@ public class CallBackThread extends Thread
 			Util.log.error("save receiveMsg failed:" + e);
 		}
 
-		// TODO Auto-generated method stub
 		callBackJson.addProperty("cmd", "smsCallback");
 		callBackJson.add("params", callBackParamJson);
 		callBackParamJson.addProperty("phone", phone);

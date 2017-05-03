@@ -52,7 +52,7 @@ public class CmppActiveTestThread extends Thread {
 				Thread.sleep(serverObject.getActiveTestTime());
 			} catch (InterruptedException e1) {
 				setAliveFlag(SocketConstant.FALSE_FLAG);
-				Util.log.error(e1);
+				Util.log.error(e1.getMessage(), e1);
 				Util.log.error("CmppActiveTestThread  "+serverObject.getAreaCode()+"  ActiveTest  sleep falied ");
 				// 关闭所有线程
 				CmppInit.closeAllThread(serverObject.getAreaCode());

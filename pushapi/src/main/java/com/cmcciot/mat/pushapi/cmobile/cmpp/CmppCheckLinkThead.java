@@ -24,7 +24,7 @@ public final class CmppCheckLinkThead extends Thread
 			}
 			catch (InterruptedException e)
 			{
-				Util.log.error(e);
+				Util.log.error(e.getMessage(), e);
 			}
 			//	Util.log.info("CMPP CHECK LINK BEGIN !!!");
 			Set<Entry<String, ServerObject>> entrySet = ParseConfig.getCityInfoByAreaCode().entrySet();
@@ -62,7 +62,7 @@ public final class CmppCheckLinkThead extends Thread
 				}
 				catch (ConnectionException e)
 				{
-					Util.log.error(e);
+					Util.log.error(e.getMessage(), e);
 				}
 				// Log event.
 				Util.log.info("CmppCheckLinkThead connection was closed !");

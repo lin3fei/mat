@@ -2,7 +2,8 @@ package com.cmcciot.mat.appagent.http.nio.threadpool;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cmcciot.mat.common.utils.HttpClientUtils;
 import com.cmcciot.mat.common.utils.PropertyUtil;
@@ -15,7 +16,7 @@ public class ThreadPoolTask implements Runnable, Serializable
      */
     private static final long serialVersionUID = 1L;
     
-    private Logger logger = Logger.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     
     /**
      * 消息内容

@@ -53,7 +53,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <一句话功能简述>
@@ -66,7 +67,7 @@ import org.apache.log4j.Logger;
  */
 public class HttpClientUtils {
     
-    private static Logger logger = Logger.getLogger(HttpClientUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
     private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
     

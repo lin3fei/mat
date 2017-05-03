@@ -13,7 +13,7 @@
 	<!-- 不以级别分类 -->
 	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logPath}/filemanage/filemanage-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${logPath}/pushapi/pushapi-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
         <encoder>

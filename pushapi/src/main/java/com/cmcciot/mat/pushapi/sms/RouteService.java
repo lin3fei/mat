@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Level;
-
 import com.cmcciot.mat.pushapi.cmobile.server.SendMessage;
 import com.cmcciot.mat.pushapi.push.PushApiVersion;
 import com.cmcciot.mat.pushapi.push.Pusher;
@@ -336,12 +334,10 @@ public class RouteService {
 			} else if ("syncPushMsgStatus".equals(reqCmd)) {// 同步消息状态
 				Pusher.feedbackMsg(params);
 			} else if ("sysRefresh".equals(reqCmd)) {// 刷新系统配置
-				Util.log.setLevel(Level.toLevel(params.get("logLevel")
-						.getAsString().toUpperCase()));
+				// Util.log.setLevel(Level.toLevel(params.get("logLevel").getAsString().toUpperCase()));
 				boolean refresh = params.get("refresh").getAsBoolean();
 				if (refresh) {
 					Util.loadConfig();
-
 					CpsdnaCTSmsAgent.stopSmsServer();
 					CpsdnaCTSmsAgent.startSmsServer();
 				}

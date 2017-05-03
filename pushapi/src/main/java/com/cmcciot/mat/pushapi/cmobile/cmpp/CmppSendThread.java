@@ -291,7 +291,7 @@ public class CmppSendThread extends Thread {
 					Util.log.debug("CmppSendThread  ActiveTest  send end");
 				} catch (IOException e) {
 					setAliveFlag(SocketConstant.FALSE_FLAG);
-					Util.log.error(e);
+					Util.log.error(e.getMessage(), e);
 					Util.log.error("CmppSendThread  "
 							+ serverObject.getAreaCode()
 							+ "   ActiveTest  send failed");
@@ -385,7 +385,7 @@ public class CmppSendThread extends Thread {
 				try {
 					updateSmsStatus(singleMsg.getSequenceNo());
 				} catch (Exception ee) {
-					Util.log.error(ee);
+					Util.log.error(ee.getMessage(), ee);
 				}
 				return;
 			}
@@ -485,7 +485,7 @@ public class CmppSendThread extends Thread {
 			try {
 				singleCmppObject.getConnection().close();
 			} catch (ConnectionException e) {
-				Util.log.error(e);
+				Util.log.error(e.getMessage(), e);
 			}
 			// Log event.
 			Util.log.info("connection was closed !");
@@ -550,9 +550,9 @@ public class CmppSendThread extends Thread {
 			// Return true.
 			return true;
 		} catch (Exception e) {
-			if (LogRequests
-					.isRequested(EventID.CMPP_PACKET | EventID.EXCEPTION))
-				Util.log.error(e);
+			if (LogRequests.isRequested(EventID.CMPP_PACKET | EventID.EXCEPTION)) {
+				Util.log.error(e.getMessage(), e);
+			}
 		}
 		// Return false.
 		return false;

@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -36,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class StringUtil {
 	private static ObjectMapper objectMapper = null;
 
-	static Logger logger = Logger.getLogger(StringUtil.class);
+	static Logger logger = LoggerFactory.getLogger(StringUtil.class);
 
 	/**
 	 * 判断字符串是否为空串 <功能详细描述>

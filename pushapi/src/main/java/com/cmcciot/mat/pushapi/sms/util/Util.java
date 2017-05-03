@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cmcciot.mat.pushapi.sysrefresh.SysConfigFlush;
 import com.google.gson.JsonObject;
@@ -21,7 +23,7 @@ import com.google.gson.JsonObject;
 public class Util
 {
 
-	final public static Logger log = Logger.getLogger(Util.class);
+	final public static Logger log = LoggerFactory.getLogger(Util.class);
 	final public static Map<String, Class<?>> senderMap = new HashMap<String, Class<?>>();
 
 	public static Properties p = new Properties();

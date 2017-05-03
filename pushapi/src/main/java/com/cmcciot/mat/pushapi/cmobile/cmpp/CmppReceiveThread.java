@@ -2,7 +2,8 @@ package com.cmcciot.mat.pushapi.cmobile.cmpp;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cmcciot.mat.pushapi.cmobile.constant.SocketConstant;
 import com.cmcciot.mat.pushapi.cmobile.object.ServerObject;
@@ -128,7 +129,7 @@ public class CmppReceiveThread extends Thread {
 			    Thread.sleep(100);
 			} catch (InterruptedException e1) {
 				setAliveFlag(SocketConstant.FALSE_FLAG);
-				Util.log.error(e1);
+				Util.log.error(e1.getMessage(), e1);
 				Util.log.error(requestId + " CMPP Receive Thread Quit!"
 						+ serverObject.getAreaCode());
 				// 关闭链接
@@ -248,7 +249,7 @@ public class CmppReceiveThread extends Thread {
 								updateSmsStatus(response.sequence + "");
 							}
 						} catch (Exception ee) {
-							Util.log.error(ee);
+							Util.log.error(ee.getMessage(), ee);
 						}
 					} else {
 						Util.log.warn(requestId + " unknow package: "
@@ -298,7 +299,7 @@ public class CmppReceiveThread extends Thread {
 			try {
 				singleCmppObject.getConnection().close();
 			} catch (ConnectionException e) {
-				Util.log.error(e);
+				Util.log.error(e.getMessage(), e);
 			}
 			// Log event.
 			Util.log.info("connection was closed !");
@@ -358,7 +359,7 @@ public class CmppReceiveThread extends Thread {
 			// Return true.
 			return true;
 		} catch (Exception e) {
-			Util.log.error(e);
+			Util.log.error(e.getMessage(), e);
 		}
 		// Return false.
 		return false;
@@ -386,7 +387,7 @@ public class CmppReceiveThread extends Thread {
 		final CMPPPacket p2=packet;
 		Util.log.info("asyncWritePacket,requestId="+requestId);
 		Runnable r=new Runnable(){
-			private Logger log = Logger.getLogger(this.getClass());
+			private Logger log = LoggerFactory.getLogger(this.getClass());
 			@Override
 			public void run() {
 				try {

@@ -20,7 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.ehcache.CacheManager;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -74,7 +75,7 @@ public class Restful4NioController
     /**
      * 日志记录
      */
-    private Logger logger = Logger.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     
     @Resource
     private CacheManager ehCacheManager;
@@ -575,7 +576,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+            logger.error(e.getMessage(), e);
         }
     }
     
@@ -839,7 +840,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+        	logger.error(e.getMessage(), e);
             returnMap.put("errorCode", "1");
         }
         finally
@@ -851,7 +852,7 @@ public class Restful4NioController
             }
             catch (IOException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -937,7 +938,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+        	logger.error(e.getMessage(), e);
         }
         finally
         {
@@ -949,7 +950,7 @@ public class Restful4NioController
             }
             catch (IOException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -995,7 +996,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+        	logger.error(e.getMessage(), e);
         }
         finally
         {
@@ -1006,7 +1007,7 @@ public class Restful4NioController
             }
             catch (IOException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -1059,14 +1060,14 @@ public class Restful4NioController
     		responseContent = HttpClientUtils.healthHttpPost(requestUrl,params);
     		
     	} catch (Exception e) {
-    		logger.error(e);
+    		logger.error(e.getMessage(), e);
     	} finally {
     		
     		try {
     			response.setContentType("text/html;charset=UTF-8");
     			response.getWriter().write(responseContent);
     		} catch (IOException e) {
-    			logger.error(e);
+    			logger.error(e.getMessage(), e);
     		}
     	}
     }
@@ -1181,7 +1182,7 @@ public class Restful4NioController
             }
             catch (ChannelClientException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
                 throw new RuntimeException();
             }
             catch (ChannelServerException e)
@@ -1859,7 +1860,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+        	logger.error(e.getMessage(), e);
             returnMap.put("errorCode", "1");
         }
         finally
@@ -1871,7 +1872,7 @@ public class Restful4NioController
             }
             catch (IOException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -1899,7 +1900,7 @@ public class Restful4NioController
         }
         catch (Exception e)
         {
-            logger.error(e);
+        	logger.error(e.getMessage(), e);
         }
         finally
         {
@@ -1910,7 +1911,7 @@ public class Restful4NioController
             }
             catch (IOException e)
             {
-                logger.error(e);
+            	logger.error(e.getMessage(), e);
             }
         }
     }
