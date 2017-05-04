@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmcciot.mat.enclosure.model.dao.EnClosuerMonitorMapper">
+  <resultMap id="BaseResultMap" type="com.cmcciot.mat.enclosure.model.domain.EnClosuerMonitorBean">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="ENCLOSU_NAME" jdbcType="VARCHAR" property="enclosuName" />
+    <result column="ENCLOSU_CENTER" jdbcType="VARCHAR" property="enclosuCenter" />
+    <result column="ENCLOSU_RADIUS" jdbcType="INTEGER" property="enclosuRadius" />
+    <result column="AREA_NAME" jdbcType="VARCHAR" property="areaName" />
+    <result column="WEEK_TIME" jdbcType="VARCHAR" property="weekTime" />
+    <result column="START_TIME" jdbcType="VARCHAR" property="startTime" />
+    <result column="END_TIME" jdbcType="VARCHAR" property="endTime" />
+    <result column="STATE" jdbcType="VARCHAR" property="state" />
+    <result column="PAUSE_STATE" jdbcType="VARCHAR" property="pauseState" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="ENCLOSU_TYPE" jdbcType="VARCHAR" property="enclosuType" />
+    <result column="MONITOR_ID" jdbcType="VARCHAR" property="monitorId" />
+    <result column="DEVICE_ID" jdbcType="VARCHAR" property="deviceId" />
+    <result column="IORG_ID" jdbcType="VARCHAR" property="orgId" />
+    <result column="ENCLOSU_CENTER_NAME" jdbcType="VARCHAR" property="enclosu_center_name" />
+    
+    
+  </resultMap>
+  
+  <resultMap id="AssocialResultMap" type="com.cmcciot.mat.enclosure.model.domain.EnClosuerAssocialBean">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="DEVICEID" jdbcType="INTEGER" property="deviceId" />
+    <result column="MONITOR" jdbcType="INTEGER" property="monitorId" />
+    <result column="IORG_ID" jdbcType="INTEGER" property="org_id" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ID, USER_NAME, USER_NICKNAME, USER_PHONE_NO, USER_KEY, USER_PHOTO, REGISTER_TIME,
+    IMEI, CURRENT_LOCATION, CITY, CITY_NAME, LOGIN_TIME, PROVINCE, PROVINCE_NAME, UID_OPEN_PLATFORM,
+    USER_TYPE, APPTYPE, STATUS, IS_BOSS, BOSS_NAME, IS_SYN, IS_HY, HYID, ISBANDING_STATUS,
+    BANDING_TIME
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_user_info
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="queryInvaildEnClosure"  resultType="java.util.HashMap" >
+
+		
+			<!-- SELECT
+				d.SD_DEVICE_ID AS DEVICEID,
+				d.DEVICE_IMEI,
+				d.DEVICE_IMSI,
+				i.MONITOR_NAME,
+				u.IORG_LEADER_PHONE,
+				temp.ENCLOSU_CENTER,
+				temp.ENCLOSU_RADIUS,
+				temp.ENCLOSU_TYPE,
+				temp.ID as ENCLOSUID,
+				hds.ID as HISTORYDATAID,
+				hds.LONGITUDE,
+				hds.LATITUDE,
+				hds.ALARMDATE,
+				hds.UPDATEDATE
+			FROM
+				t_enclosure_association_info t,
+				t_monitor_info i,
+				t_alarm_set s ,
+				t_industry_org u,
+			(
+					SELECT
+						*
+					FROM
+						t_enclosure_monitor_info e
+					WHERE
+						e.STATE = '0'
+					AND e.PAUSE_STATE = '0'
+					AND substring(
+						e.WEEK_TIME,
+						(SELECT dayofweek(now())),
+						1
+					) = '1'
+					AND e.START_TIME <= DATE_FORMAT(now(), '%H:%i')
+					AND e.END_TIME >= DATE_FORMAT(now(), '%H:%i')
+				) temp,
+				t_device_info d
+				LEFT JOIN 
+				t_enclosure_device_historydatastream hds on hds.deviceid = d.SD_DEVICE_ID
+			WHERE
+				temp.id = t.ENCLOSU_ID
+			AND d.MONITOR_ID = t.MONITOR
+			AND u.IORG_ID = t.IORG_ID
+			AND t.MONITOR = i.MONITOR_ID
+			AND u.IORG_TOP_PARENT_ID = s.IORG_ID
+			AND  (hds.ENCLOSUID IS NULL OR temp.ID = hds.ENCLOSUID )
+			AND s.BOUND_ALARM_STATE = '0'
+			AND d.ISBAND = '2'
+			AND u.IORG_STATUS = '1' -->
+		<![CDATA[	SELECT bb.DEVICEID,
+				 bb.DEVICE_IMEI,
+			         bb.DEVICE_IMSI,
+			         bb.MONITOR_NAME,
+			         bb.IORG_LEADER_PHONE,
+			         bb.ENCLOSU_CENTER,
+			         bb.ENCLOSU_RADIUS,
+			         bb.ENCLOSU_TYPE,
+			         bb.ENCLOSUID AS ENCLOSUID,
+			         hds.ID AS HISTORYDATAID,
+			         hds.LONGITUDE,
+			         hds.LATITUDE,
+			         hds.ALARMDATE,
+			         hds.UPDATEDATE
+			 FROM (
+								SELECT   F.SD_DEVICE_ID AS DEVICEID,
+												 F.DEVICE_IMEI,
+												 F.DEVICE_IMSI,
+												 B.MONITOR_NAME,
+												 D.IORG_LEADER_PHONE,
+												 aa.ENCLOSU_CENTER,
+												 aa.ENCLOSU_RADIUS,
+												 aa.ENCLOSU_TYPE,
+												 aa.ID AS ENCLOSUID
+								 FROM(		
+									                   SELECT temp.ID,
+									                          temp.AREA_NAME,
+																temp.ENCLOSU_CENTER,
+																temp.ENCLOSU_RADIUS,
+																temp.ENCLOSU_TYPE,
+																a.DEVICE_ID,
+																a.IORG_ID,
+																a.MONITOR FROM t_enclosure_association_info a,	(
+																		SELECT	e.AREA_NAME,
+																						e.CREATE_TIME,
+																						e.ENCLOSU_CENTER,
+																						e.ENCLOSU_CENTER_NAME,
+																						e.ENCLOSU_NAME,
+																						e.ENCLOSU_RADIUS,
+																						e.ENCLOSU_TYPE,
+																						e.END_TIME,
+																						e.ID
+																						FROM
+																							t_enclosure_monitor_info e
+																						WHERE
+																							e.STATE = '0'
+																						AND e.PAUSE_STATE = '0'
+																						AND substring(
+																							e.WEEK_TIME,
+																							(SELECT dayofweek(now())),
+																							1
+																						) = '1'
+																						AND e.START_TIME <= DATE_FORMAT(now(), '%H:%i')
+																						AND e.END_TIME >= DATE_FORMAT(now(), '%H:%i') ) temp  WHERE a.ENCLOSU_ID = temp.ID) aa,
+																						t_monitor_info B,
+																						t_alarm_set C,
+																						t_industry_org D,
+																						t_device_info F
+																						 WHERE 
+																						aa.MONITOR = B.MONITOR_ID
+																						AND aa.IORG_ID = D.IORG_ID
+																						AND C.IORG_ID = D.IORG_TOP_PARENT_ID
+																						AND F.ID = aa.DEVICE_ID
+			) bb LEFT JOIN t_enclosure_device_historydatastream hds ON
+			          bb.DEVICEID = hds.DEVICEID 
+			          AND bb.ENCLOSUID = hds.ENCLOSUID
+		]]>
+  </select>
+  
+  <select id="selectByOrgId" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+  	SELECT
+		a.ID AS ID,
+		a.ENCLOSU_NAME AS ENCLOSU_NAME,
+		a.ENCLOSU_CENTER AS ENCLOSU_CENTER
+	FROM
+		t_enclosure_monitor_info a
+	WHERE
+	a.ID IN (
+		SELECT DISTINCT
+			(ENCLOSU_ID)
+		FROM
+			t_enclosure_association_info
+		WHERE
+			IORG_ID IN (
+						SELECT
+							IORG_ID
+						FROM
+							t_industry_org
+						WHERE
+							IORG_TOP_PARENT_ID = #{org_id,jdbcType=INTEGER}
+			)
+	)
+	order by a.CREATE_TIME DESC
+  </select>
+  
+  <select id="selectByOrgIdAndName" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerMonitorBean" resultType="java.util.HashMap">
+  	SELECT
+		a.ID AS ID,
+		a.ENCLOSU_NAME AS ENCLOSU_NAME,
+		a.ENCLOSU_CENTER AS ENCLOSU_CENTER
+	FROM
+		t_enclosure_monitor_info a
+	WHERE 1 = 1 
+	and	
+	ENCLOSU_NAME like CONCAT('%','${enclosuName}','%' ) 
+	and
+	a.ID IN (
+		SELECT DISTINCT
+			(ENCLOSU_ID)
+		FROM
+			t_enclosure_association_info
+		WHERE
+			IORG_ID IN (
+						SELECT
+							IORG_ID
+						FROM
+							t_industry_org
+						WHERE
+							IORG_TOP_PARENT_ID = #{orgId,jdbcType=VARCHAR}
+					
+			)
+	)
+	order by a.CREATE_TIME DESC
+  </select>
+  
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+	  SELECT
+		a.ID,
+		a.ENCLOSU_NAME,
+		a.ENCLOSU_CENTER,
+		a.ENCLOSU_RADIUS,
+		a.AREA_NAME,
+		a.WEEK_TIME,
+		a.START_TIME,
+		a.END_TIME,
+		a.STATE,
+		a.PAUSE_STATE,
+		a.CREATE_TIME,
+		a.ENCLOSU_TYPE,
+		a.ENCLOSU_CENTER_NAME
+	FROM
+		t_enclosure_monitor_info a
+	WHERE
+		a.ID = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectIorg" resultType="java.util.HashMap">
+	  select 
+	  IORG_ID,
+	  IORG_NAME 
+	  from 
+	  	t_industry_org 
+	  WHERE 
+	  	IORG_STATUS=1
+  </select>
+  
+ <select id="selectThirdIorg" resultType="java.util.HashMap">
+     select IORG_ID from t_industry_org where IORG_PARENT_ID = #{orgId,jdbcType=INTEGER}
+  </select>
+  
+   <select id="selectMonitor" resultType="java.util.HashMap">
+     select 
+		 a.MONITOR_ID  as monitorId,
+		 a.MONITOR_NAME  as monitorName,
+		 a.MONITOR_IORG_ID  as orgId,
+		 (select IORG_NAME from t_industry_org where IORG_ID = a.MONITOR_IORG_ID) as orgName,
+		 (
+			
+				(
+					SELECT
+						IORG_NAME
+					FROM
+						t_industry_org
+					WHERE
+						IORG_ID = (
+							SELECT
+								IORG_PARENT_ID
+							FROM
+								t_industry_org
+							WHERE
+								IORG_ID = a.MONITOR_IORG_ID
+						)
+				) 
+			
+		) AS parentIorgName,
+		b.ID as deviceId
+	 from 
+	 	t_monitor_info a,t_device_info b
+	 where 
+	 	a.MONITOR_IORG_ID in 
+ 	<foreach item="item" index="index" collection="list" 
+                     open="(" separator="," close=")">
+                   #{item}
+     </foreach>
+     and b.MONITOR_ID = a.MONITOR_ID
+     and b.ISBAND = '2'
+  </select>
+  
+  <select id="selectUnoccupiedMonitor"  parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		    SELECT
+			a.MONITOR_ID AS monitorId,
+			a.MONITOR_NAME AS monitorName,
+			a.MONITOR_IORG_ID AS orgId,
+			(
+				SELECT
+					IORG_NAME
+				FROM
+					t_industry_org
+				WHERE
+					IORG_ID = a.MONITOR_IORG_ID
+			) AS orgName,
+			(
+			
+				(
+					SELECT
+						IORG_NAME
+					FROM
+						t_industry_org
+					WHERE
+						IORG_ID = (
+							SELECT
+								IORG_PARENT_ID
+							FROM
+								t_industry_org
+							WHERE
+								IORG_ID = a.MONITOR_IORG_ID
+						)
+				) 
+			
+		) AS parentIorgName,
+		b.ID as deviceId
+		FROM
+			t_monitor_info a,t_device_info b
+		WHERE
+			MONITOR_IORG_ID IN 
+			
+			<foreach item="item" index="index" collection="list" 
+                     open="(" separator="," close=")">
+                   #{item}
+     		</foreach>
+			
+		AND a.MONITOR_ID NOT IN (
+			SELECT
+				MONITOR
+			FROM
+				t_enclosure_association_info
+			WHERE
+				ENCLOSU_ID = #{eId,jdbcType=INTEGER}
+		)
+		AND b.MONITOR_ID = a.MONITOR_ID
+ 		AND b.ISBAND = '2'
+  </select>
+  
+  <select id="selectIorgAndParIorg" resultType="java.util.HashMap">
+  	 SELECT
+		t.MONITOR_NAME,
+		(
+			SELECT
+				IORG_NAME
+			FROM
+				t_industry_org
+			WHERE
+				IORG_ID = t.MONITOR_IORG_ID
+		) IORG_NAME,
+		(
+			SELECT
+				(
+					SELECT
+						IORG_NAME
+					FROM
+						t_industry_org
+					WHERE
+						IORG_ID = (
+							SELECT
+								IORG_PARENT_ID
+							FROM
+								t_industry_org
+							WHERE
+								IORG_ID = t.MONITOR_IORG_ID
+						)
+				) 
+			FROM
+				t_industry_org
+			WHERE
+				IORG_ID = t.MONITOR_IORG_ID
+		) AS PARTIORG_NAME,
+				t.MONITOR_IORG_ID
+			FROM
+				t_monitor_info t
+			WHERE
+				t.MONITOR_ID IN (
+			SELECT
+				MONITOR
+			FROM
+				t_enclosure_association_info
+			WHERE
+		ENCLOSU_ID = #{orgId,jdbcType=INTEGER}
+		)
+  </select>
+  
+  <select id="selectIorgAndParIorgUsed" resultType="java.util.HashMap">
+  	SELECT
+	t.MONITOR_ID AS monitorId,
+	t.MONITOR_NAME AS monitorName,
+	(
+		SELECT
+			IORG_NAME
+		FROM
+			t_industry_org
+		WHERE
+			IORG_ID = t.MONITOR_IORG_ID
+	) orgName,
+	t.MONITOR_IORG_ID AS orgId,
+	(
+		SELECT
+			(
+				SELECT
+					IORG_ID
+				FROM
+					t_industry_org
+				WHERE
+					IORG_ID = (
+						SELECT
+							IORG_PARENT_ID
+						FROM
+							t_industry_org
+						WHERE
+							IORG_ID = t.MONITOR_IORG_ID
+					)
+			)
+		FROM
+			t_industry_org
+		WHERE
+			IORG_ID = t.MONITOR_IORG_ID
+	) AS iorgId,
+	(
+		SELECT
+			(
+				SELECT
+					IORG_NAME
+				FROM
+					t_industry_org
+				WHERE
+					IORG_ID = (
+						SELECT
+							IORG_PARENT_ID
+						FROM
+							t_industry_org
+						WHERE
+							IORG_ID = t.MONITOR_IORG_ID
+					)
+			)
+		FROM
+			t_industry_org
+		WHERE
+			IORG_ID = t.MONITOR_IORG_ID
+	) AS iorgName
+FROM
+	t_monitor_info t
+WHERE
+	t.MONITOR_ID IN (
+		SELECT
+			MONITOR
+		FROM
+			t_enclosure_association_info
+		WHERE
+			ENCLOSU_ID = #{orgId,jdbcType=INTEGER}
+	)
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_enclosure_monitor_info
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAssocialByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_enclosure_association_info
+    where ENCLOSU_ID = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteAlertMessage" parameterType="java.util.Map">
+    delete from t_alert_message
+    where ENCLOSURE_ID = #{id,jdbcType=INTEGER}
+    and ALERT_DEVICE_ID =  #{deviceId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteHistorydatastream" parameterType="java.util.Map">
+    delete from t_enclosure_device_historydatastream
+    where ENCLOSUID = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <select id="queryAssocialByPrimaryKey" resultType="java.util.Map" parameterType="java.lang.Integer">
+  	SELECT a.DEVICE_ID FROM t_enclosure_association_info a WHERE a.ENCLOSU_ID=#{id,jdbcType=INTEGER}
+  </select>
+  
+  <insert id="insert" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerMonitorBean">
+    insert into t_enclosure_monitor_info (ID, ENCLOSU_NAME,
+		    ENCLOSU_CENTER,ENCLOSU_RADIUS,AREA_NAME, WEEK_TIME, START_TIME,
+		    END_TIME, STATE, PAUSE_STATE,GAODE_GPS, CREATE_TIME, ENCLSR_FIXED_SHOW_ID,ENCLOSU_TYPE)
+    values (
+		    #{id,jdbcType=INTEGER},
+		    #{enclosuName,jdbcType=VARCHAR},
+		    #{enclosuCenter,jdbcType=VARCHAR},
+		    #{enclosuRadius,jdbcType=VARCHAR},
+		    #{areaName,jdbcType=VARCHAR},
+		    #{weekTime,jdbcType=VARCHAR},
+		    #{startTime,jdbcType=VARCHAR},
+		    #{endTime,jdbcType=VARCHAR},
+		    #{state,jdbcType=VARCHAR},
+		    #{pauseState,jdbcType=VARCHAR},
+		    #{gaodeGps,jdbcType=VARCHAR},
+		    #{createTime,jdbcType=VARCHAR},
+		    #{enclsrfixedshowId,jdbcType=VARCHAR},
+		    #{enclosuType,jdbcType=VARCHAR}
+     )
+  </insert>
+  <insert id="addEnClosureDeviceHistoryDataStrams" parameterType="java.util.HashMap">
+    insert into t_enclosure_device_historydatastream ( DEVICEID, LONGITUDE,LATITUDE, UPDATEDATE, ENCLOSUID
+    <if test="alarmdate != null">
+    ,ALARMDATE
+    </if>
+    )
+    values (
+		    #{deviceid},
+		    #{longitude},
+		    #{latitude},
+		    #{updatedate},
+		    #{enclosuid}
+		    <if test="alarmdate != null">
+        	,#{alarmdate}
+      		</if>
+     )
+  </insert>
+   <update id="updateEnClosureDeviceHistoryDataStrams" parameterType="java.util.HashMap">
+    update t_enclosure_device_historydatastream
+    <set>
+      <if test="longitude != null">
+        LONGITUDE = #{longitude},
+      </if>
+      <if test="latitude != null">
+        LATITUDE = #{latitude},
+      </if>
+      <if test="updatedate != null">
+        UPDATEDATE = #{updatedate},
+      </if>
+      <if test="enclosuid != null">
+        ENCLOSUID = #{enclosuid},
+      </if>
+      <if test="alarmdate != null">
+        ALARMDATE = #{alarmdate},
+      </if>
+    </set>
+    where ID = #{historyId}
+  </update>
+    <insert id="insertAssocial" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerAssocialBean">
+    insert into t_enclosure_association_info (
+    		id, DEVICEID,ENCLOSU_NAME,MONITOR,IORG_ID)
+    values(
+		    #{id,jdbcType=INTEGER},
+		    #{deviceId,jdbcType=VARCHAR},
+		    #{monitorId,jdbcType=VARCHAR},
+		    #{org_id,jdbcType=VARCHAR}
+    )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerMonitorBean" useGeneratedKeys="true" keyProperty="id">
+    insert into t_enclosure_monitor_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="enclosuName != null">
+        ENCLOSU_NAME,
+      </if>
+      <if test="enclosuCenter != null">
+        ENCLOSU_CENTER,
+      </if>
+      <if test="enclosuRadius != null">
+        ENCLOSU_RADIUS,
+      </if>
+      <if test="areaName != null">
+        AREA_NAME,
+      </if>
+      <if test="weekTime != null">
+        WEEK_TIME,
+      </if>
+      <if test="startTime != null">
+        START_TIME,
+      </if>
+      <if test="endTime != null">
+        END_TIME,
+      </if>
+      <if test="state != null">
+        STATE,
+      </if>
+      <if test="pauseState != null">
+        PAUSE_STATE,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="enclosuType != null">
+        ENCLOSU_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="enclosuName != null">
+        #{enclosuName,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuCenter != null">
+        #{enclosuCenter,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuRadius != null">
+        #{enclosuRadius,jdbcType=VARCHAR},
+      </if>
+      <if test="areaName != null">
+        #{areaName,jdbcType=VARCHAR},
+      </if>
+      <if test="weekTime != null">
+        #{weekTime,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="pauseState != null">
+        #{pauseState,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuType != null">
+        #{enclosuType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <insert id="insertAssocialSelective" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerAssocialBean">
+    insert into t_enclosure_association_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="monitorId != null">
+        MONITOR,
+      </if>
+      <if test="org_id != null">
+        IORG_ID,
+      </if>
+      <if test="org_id != null">
+        ENCLOSU_ID,
+      </if>
+      <if test="org_id != null">
+        DEVICE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="monitorId != null">
+        #{monitorId,jdbcType=VARCHAR},
+      </if>
+      <if test="org_id != null">
+        #{org_id,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuId != null">
+        #{enclosuId,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuId != null">
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cmcciot.mat.enclosure.model.domain.EnClosuerMonitorBean">
+    update t_enclosure_monitor_info
+    <set>
+      <if test="enclosuName != null">
+        ENCLOSU_NAME = #{enclosuName,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuCenter != null">
+        ENCLOSU_CENTER = #{enclosuCenter,jdbcType=VARCHAR},
+      </if>
+      <if test="enclosuRadius != 0">
+        ENCLOSU_RADIUS = #{enclosuRadius,jdbcType=INTEGER},
+      </if>
+      <if test="areaName != null">
+        AREA_NAME = #{areaName,jdbcType=VARCHAR},
+      </if>
+      <if test="weekTime != null">
+        WEEK_TIME = #{weekTime,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="enclosuType != null">
+        ENCLOSU_TYPE = #{enclosuType,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="startTime != null">
+        START_TIME = #{startTime,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null">
+        END_TIME = #{endTime,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+ 
+  
+  <update id="updateByPrimaryKey" parameterType="com.cmcciot.mat.enclosure.model.domain.UserInfo">
+    update t_user_info
+    set USER_NAME = #{userName,jdbcType=VARCHAR},
+    USER_NICKNAME = #{userNickname,jdbcType=VARCHAR},
+    USER_PHONE_NO = #{userPhoneNo,jdbcType=VARCHAR},
+    USER_KEY = #{userKey,jdbcType=VARCHAR},
+    USER_PHOTO = #{userPhoto,jdbcType=VARCHAR},
+    REGISTER_TIME = #{registerTime,jdbcType=VARCHAR},
+    IMEI = #{imei,jdbcType=VARCHAR},
+    CURRENT_LOCATION = #{currentLocation,jdbcType=VARCHAR},
+    CITY = #{city,jdbcType=VARCHAR},
+    CITY_NAME = #{cityName,jdbcType=VARCHAR},
+    LOGIN_TIME = #{loginTime,jdbcType=VARCHAR},
+    PROVINCE = #{province,jdbcType=VARCHAR},
+    PROVINCE_NAME = #{provinceName,jdbcType=VARCHAR},
+    UID_OPEN_PLATFORM = #{uidOpenPlatform,jdbcType=VARCHAR},
+    USER_TYPE = #{userType,jdbcType=VARCHAR},
+    APPTYPE = #{apptype,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=INTEGER},
+    IS_BOSS = #{isBoss,jdbcType=VARCHAR},
+    BOSS_NAME = #{bossName,jdbcType=VARCHAR},
+    IS_SYN = #{isSyn,jdbcType=VARCHAR},
+    IS_HY = #{isHy,jdbcType=VARCHAR},
+    HYID = #{hyid,jdbcType=VARCHAR},
+    ISBANDING_STATUS = #{isbandingStatus,jdbcType=VARCHAR},
+    BANDING_TIME = #{bandingTime,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="addAlarmLog" parameterType="com.cmcciot.mat.enclosure.model.domain.EnclosuLogBean">
+		INSERT INTO T_ENCLOSURE_LOG
+		(
+			ENCLOSU_ID,
+			DEVICE_ID,
+			ALARM_INFO,
+			ALARM_TIMES,
+			CREATE_TIME
+		)
+		VALUES
+		(
+			#{enclosuId},
+			#{deviceId},
+			#{alarmInfo},
+			#{alarmTimes},
+			#{creatTime}
+		)
+	</insert>
+	<insert id="addAlertMessage" parameterType="com.cmcciot.mat.enclosure.model.domain.AlertMessageBean">
+		INSERT INTO T_ALERT_MESSAGE
+		(
+			ALERT_DEVICE_ID,
+			ALERT_TIME,
+			ALERT_SAVE_TIME,
+			ALERT_INDEX,
+			ALERT_VALUE,
+			ALERT_THRESHOLD,
+			ALERT_CONDITION,
+			ALERT_INFO,
+			SD_ALERT_ID,
+			RECORD_INDEX,
+			ENCLOSURE_ID
+		)
+		VALUES 
+		(
+			#{alertDeviceId},
+			#{alertTime},
+			#{saveTime},
+			#{alertIndex},
+			#{alertValue},
+			#{alertThreshold},
+			#{alertCondition},
+			#{alertInfo},
+			#{sdAlertId},
+			#{recordIndex},
+			#{enclosureId}
+		)
+	</insert>
+	<insert id="addMultipleData" parameterType="com.cmcciot.mat.enclosure.model.domain.MultipleDataBean">
+		INSERT INTO T_MULTIPLE_INFO
+		(
+			ID,
+			DEVICE_ID,
+			TYPE,
+			TIME,
+			DATA,
+			ENCLOSURE_ID
+		)
+		VALUES 
+		(
+			#{id},
+			#{deviceId},
+			#{type},
+			#{time},
+			#{data},
+			#{enclosureId}
+		)
+	</insert>
+	<insert id="addSmsLogs" parameterType="com.cmcciot.mat.enclosure.model.domain.SmsLogsBean">
+		
+		<![CDATA[
+			INSERT INTO
+			T_SMS_LOGS(create_time,phone,content,sussessFlag,response)
+			VALUES 
+			(#{createTime},#{phone},#{content},#{sussessFlag},#{response})
+		]]>
+	</insert>
+	
+	<select id="selectBeviceid" parameterType="java.lang.String" resultType="java.util.HashMap">
+	    select
+	    ID
+	    from t_device_info
+	    where sd_device_id = #{deviceId}
+  </select>
+  
+  <select id="selectDeviceInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
+	   select 
+	   ID,
+	   MONITOR_ID 
+	   from 
+	   t_device_info 
+	   where 
+	   MONITOR_ID=#{monitorId}
+  </select>
+  
+   <insert id="addEnClosureDeviceHistory" parameterType="com.cmcciot.mat.enclosure.model.domain.EnclosureDeviceHistorydatastreamBean">
+    insert into t_enclosure_device_historydatastream ( DEVICEID, LONGITUDE,LATITUDE, UPDATEDATE, ENCLOSUID
+    <if test="alarmdate != null">
+    ,ALARMDATE
+    </if>
+    )
+    values (
+		    #{deviceid},
+		    #{longitude},
+		    #{latitude},
+		    #{updatedate},
+		    #{enclosuid}
+		    <if test="alarmdate != null">
+        	,#{alarmdate}
+      		</if>
+     )
+  </insert>
+</mapper>
