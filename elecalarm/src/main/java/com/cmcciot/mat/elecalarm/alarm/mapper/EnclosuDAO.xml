@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmcciot.mat.elecalarm.alarm.dao.EnclosuDAO">
+	<resultMap type="com.cmcciot.mat.elecalarm.alarm.bean.EnclosuBean" id="EnclosuBeanResultMap">
+		<result property="id" column="ID" javaType="java.lang.Integer" />
+		<result property="deviceId" column="DEVICE_ID" javaType="java.lang.Integer" />
+		<result property="enclosuName" column="ENCLOSU_NAME" javaType="String" />
+		<result property="enclosuCenter" column="ENCLOSU_CENTER" javaType="String" />
+		<result property="enclosuRadius" column="ENCLOSU_RADIUS" javaType="java.lang.Integer" />
+		<result property="areaName" column="AREA_NAME" javaType="String" />
+		<result property="weekTime" column="WEEK_TIME" javaType="String" />
+		<result property="startTime" column="START_TIME" javaType="String" />
+		<result property="endTime" column="END_TIME" javaType="String" />
+		<result property="state" column="STATE" javaType="String" />
+		<result property="pauseState" column="PAUSE_STATE" javaType="String" />
+		<result property="gaodeGps" column="GAODE_GPS" javaType="String" />
+		<result property="createTime" column="CREATE_TIME" javaType="String" />
+	</resultMap>
+	
+	<resultMap type="com.cmcciot.mat.elecalarm.alarm.bean.EncloAlarmBean" id="EncloAlarmBeanResultMap">
+		<result property="id" column="ID" javaType="java.lang.Integer" />
+		<result property="encloId" column="ENCLO_ID" javaType="java.lang.Integer" />
+		<result property="alarmTimes" column="ALARM_TIMES" javaType="java.lang.Integer" />
+	</resultMap>
+	
+	<insert id="addAlarm" parameterType="com.cmcciot.mat.elecalarm.alarm.bean.EncloAlarmBean">
+		INSERT INTO T_ENCLO_ALARM_INFO
+		(
+			ENCLO_ID,
+			ALARM_TIMES
+		)
+		VALUES
+		(
+			#{encloId},
+			#{alarmTimes}
+		)
+	</insert>
+	<insert id="addAlertMessage" parameterType="com.cmcciot.mat.elecalarm.alarm.bean.AlertMessageBean">
+		INSERT INTO T_ALERT_MESSAGE
+		(
+			ALERT_DEVICE_ID,
+			ALERT_TIME,
+			ALERT_SAVE_TIME,
+			ALERT_INDEX,
+			ALERT_VALUE,
+			ALERT_THRESHOLD,
+			ALERT_CONDITION,
+			ALERT_INFO,
+			SD_ALERT_ID,
+			RECORD_INDEX,
+			ENCLOSURE_ID
+		)
+		VALUES 
+		(
+			#{alertDeviceId},
+			#{alertTime},
+			#{saveTime},
+			#{alertIndex},
+			#{alertValue},
+			#{alertThreshold},
+			#{alertCondition},
+			#{alertInfo},
+			#{sdAlertId},
+			#{recordIndex},
+			#{enclosureId}
+		)
+	</insert>
+	<update id="updateAlarm" parameterType="java.lang.Integer">
+		UPDATE
+			T_ENCLO_ALARM_INFO
+		SET
+			ALARM_TIMES = #{1}
+		WHERE
+			ENCLO_ID = #{0}
+	</update>
+	<update id="updateEncloInfo" parameterType="java.lang.Integer">
+		UPDATE
+			T_ENCLOSURE_INFO
+		SET
+			PAUSE_STATE = #{1}
+		WHERE
+			ID = #{0}
+	</update>
+	<update id="updateAllEncloInfo" parameterType="java.lang.Integer">
+		UPDATE
+			T_ENCLOSURE_INFO
+		SET
+			PAUSE_STATE = #{0}
+	</update>
+	<delete id="deleteAlarm" parameterType="java.lang.Integer">
+		DELETE FROM T_ENCLO_ALARM_INFO WHERE ENCLO_ID = #{0}
+	</delete>
+	<select id="findDeviceList" resultMap="EnclosuBeanResultMap"> 
+		SELECT
+			ID,
+			DEVICE_ID,
+			ENCLOSU_NAME,
+			ENCLOSU_CENTER,
+			ENCLOSU_RADIUS,
+			AREA_NAME,
+			WEEK_TIME,
+			START_TIME,
+			END_TIME,
+			STATE,
+			PAUSE_STATE,
+			GAODE_GPS,
+			CREATE_TIME
+		FROM T_ENCLOSURE_INFO
+		WHERE 1 = 1
+		AND STATE = '0'
+		AND PAUSE_STATE = '0'
+	</select>
+	<select id="findDevice" resultMap="EnclosuBeanResultMap" parameterType="java.lang.Integer"> 
+		SELECT
+			ID,
+			DEVICE_ID,
+			ENCLOSU_NAME,
+			ENCLOSU_CENTER,
+			ENCLOSU_RADIUS,
+			AREA_NAME,
+			WEEK_TIME,
+			START_TIME,
+			END_TIME,
+			STATE,
+			PAUSE_STATE,
+			GAODE_GPS,
+			CREATE_TIME
+		FROM T_ENCLOSURE_INFO
+		WHERE 1 = 1
+		AND STATE = '0'
+		AND PAUSE_STATE = '0'
+		AND ID = #{0}
+	</select>
+	<select id="findAlarm" resultMap="EncloAlarmBeanResultMap" parameterType="java.lang.Integer"> 
+		SELECT
+			ID,
+			ENCLO_ID,
+			ALARM_TIMES
+		FROM T_ENCLO_ALARM_INFO
+		WHERE 1 = 1
+		AND ENCLO_ID = #{0}
+	</select>
+	<insert id="addAlarmLog" parameterType="com.cmcciot.mat.elecalarm.alarm.bean.EnclosuLogBean">
+		INSERT INTO T_ENCLOSURE_LOG
+		(
+			ENCLOSU_ID,
+			DEVICE_ID,
+			ALARM_INFO,
+			ALARM_TIMES,
+			CREATE_TIME
+		)
+		VALUES
+		(
+			#{enclosuId},
+			#{deviceId},
+			#{alarmInfo},
+			#{alarmTimes},
+			#{creatTime}
+		)
+	</insert>
+	<insert id="addMultipleData" parameterType="com.cmcciot.mat.elecalarm.alarm.bean.MultipleDataBean">
+		INSERT INTO T_MULTIPLE_INFO
+		(
+			ID,
+			DEVICE_ID,
+			TYPE,
+			TIME,
+			DATA,
+			ENCLOSURE_ID
+		)
+		VALUES 
+		(
+			#{id},
+			#{deviceId},
+			#{type},
+			#{time},
+			#{data},
+			#{enclosureId}
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+	default-lazy-init="true">
+	<!-- 你要执行的任务类  -->
+    <bean id="trigger1" class="com.cmcciot.mat.elecalarm.alarm.execute.EnclosuTrigger"/>
+    <bean id="trigger2" class="com.cmcciot.mat.elecalarm.alarm.execute.EnclosuTrigger"/>
+	<!-- 定义调用对象和调用对象的方法 -->
+    <bean id="mainJob1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="trigger1"/>
+        </property>
+        <property name="targetMethod">
+            <value>executeNew</value>
+        </property>
+	</bean>
+	<bean id="mainJob2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="trigger2"/>
+        </property>
+        <property name="targetMethod">
+            <value>update</value>
+        </property>
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="timeTrigger1" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    	<property name="jobDetail">
+        	<ref bean="mainJob1"/>
+        </property>
+        <property name="cronExpression">
+        	<!-- 定时的语法   -->
+            <value>0 0/3 * * * ?</value>
+        </property>
+	</bean>
+	<bean id="timeTrigger2" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    	<property name="jobDetail">
+        	<ref bean="mainJob2"/>
+        </property>
+        <property name="cronExpression">
+        	<!-- 定时的语法   -->
+            <value>0 0 0 * * ?</value>
+        </property>
+	</bean>
+	<!-- 总管理类  -->
+	<bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers"> 
+            <list>
+                <ref bean="timeTrigger1"/>
+                <ref bean="timeTrigger2"/>
+            </list>
+        </property>
+	</bean>
+</beans>

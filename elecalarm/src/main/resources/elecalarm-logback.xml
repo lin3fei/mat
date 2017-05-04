@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+	<!-- <property name="logPath" value="/opt/logs/mat" /> -->
+	<property name="logPath" value="D:/logs/mat" />
+	
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 不以级别分类 -->
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/elecalarm/elecalarm-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <logger name="org.mybatis" level="debug"/>
+    <logger name="org.springframework" level="info"/>
+
+    <root level="debug">
+        <appender-ref ref="file" />
+        <appender-ref ref="console" />
+        <appender-ref ref="org.mybatis"/>
+        <appender-ref ref="org.springframework"/>
+    </root>
+</configuration>

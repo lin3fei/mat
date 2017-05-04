@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmcciot.mat.elecalarm.locationmanager.dao.DeviceDAO">
+	<resultMap type="com.cmcciot.mat.elecalarm.locationmanager.bean.DeviceBean" id="DeviceBeanResultMap">
+		<result property="id" column="ID" />
+		<result property="device_name" column="DEVICE_NAME" />
+		<result property="monitor_id" column="MONITOR_ID" />
+		<result property="device_phone_no" column="DEVICE_PHONE_NO" />
+		<result property="device_type" column="DEVICE_TYPE" />
+		<result property="device_IMEI" column="DEVICE_IMEI" />
+		<result property="device_desc" column="DEVICE_DESC" />
+		<result property="sd_device_id" column="SD_DEVICE_ID" />
+		<result property="sd_device_key" column="SD_DEVICE_KEY" />
+		<result property="createTime" column="CREATETIME" />
+		<result property="activateTime" column="ACTIVETIME" />
+		<result property="device_status" column="DEVICE_STATUS" />
+		<result property="device_imsi" column="DEVICE_IMSI" />
+		<result property="device_vender" column="DEVICE_VENDER" />
+		<result property="device_model" column="DEVICE_MODEL" />
+		<result property="spno" column="SPNO" />
+		<result property="sdaddr" column="SDADDR" />
+		<result property="sdport" column="SDPORT" />
+		<result property="pver" column="PVER" />
+		<result property="prtc" column="PRTC" />
+		<result property="hdver" column="HDVER"/>
+		<result property="fwver" column="FWVER" />
+		<result property="provinceCode" column="PROVINCECODE" />
+		<result property="cityCode" column="CITYCODE" />
+		<result property="device_sn" column="DEVICE_SN" />
+		<result property="bandtime" column="BANDTIME" />
+		<result property="isband" column="ISBAND" />
+		<result property="freq" column="FREQ" />
+		<result property="switchState" column="SWITCH_STATE" />
+	</resultMap>
+
+	<select id="findDeviceById" resultMap="DeviceBeanResultMap" parameterType="java.lang.String"> 
+		SELECT ID,
+	        DEVICE_NAME,
+	        MONITOR_ID,
+	        DEVICE_PHONE_NO,
+	        DEVICE_TYPE,
+	        DEVICE_IMEI,
+	        DEVICE_DESC,
+	        SD_DEVICE_ID,
+	        SD_DEVICE_KEY,
+	        CREATETIME,
+	        ACTIVETIME,
+	        DEVICE_STATUS,
+	        DEVICE_IMSI,
+	        DEVICE_VENDER,
+	        DEVICE_MODEL,
+	        SPNO,
+	        SDADDR,
+	        SDPORT,
+	        PVER,
+	        PRTC,
+	        HDVER,
+	        FWVER,
+	        PROVINCECODE,
+	        CITYCODE,
+	        DEVICE_SN,
+	        BANDTIME,
+	        ISBAND,
+		 	FREQ,
+		 	SWITCH_STATE
+		FROM T_DEVICE_INFO WHERE ID = #{0}
+	</select>
+</mapper>

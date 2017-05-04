@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmcciot.mat.elecalarm.locationmanager.dao.LocationDAO">
+	<resultMap type="com.cmcciot.mat.elecalarm.locationmanager.bean.PointM" id="locationBeanMap">
+		<result property="x" column="lat" />
+		<result property="y" column="lng" />
+		<result property="offsetlat" column="offsetlat" javaType="java.lang.Double"/>
+		<result property="offsetlng" column="offsetlng" javaType="java.lang.Double"/>
+	</resultMap>
+	<select id="queryOffset" resultMap="locationBeanMap" parameterType="com.cmcciot.mat.elecalarm.locationmanager.bean.PointM">
+		<![CDATA[
+			SELECT
+				offsetlat, offsetlng
+			FROM
+				chinagps_offset WHERE 1 = 1
+		]]>
+		<if test="x != null and x !=''">
+			AND	lat = #{x}
+		</if>
+		<if test="y != null and y !=''">
+			AND	lng = #{y}
+		</if>
+	</select>
+	
+</mapper>
