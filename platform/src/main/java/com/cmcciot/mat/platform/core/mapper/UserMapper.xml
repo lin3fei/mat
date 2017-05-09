@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmcciot.mat.platform.core.dao.UserDAO">
+	<select id="queryUser" parameterType="com.cmcciot.mat.platform.core.bean.UserBean" resultType="com.cmcciot.mat.platform.core.bean.UserBean">
+		select id,user_name userName,user_phone_no userPhoneNo from t_user_info
+	</select>
+</mapper>
